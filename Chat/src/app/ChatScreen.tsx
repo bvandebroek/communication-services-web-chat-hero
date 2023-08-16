@@ -12,7 +12,8 @@ import {
 } from '@azure/communication-react';
 import { Stack } from '@fluentui/react';
 import React, { useCallback, useEffect, useMemo } from 'react';
-
+/* @conditional-compile-remove(chat-composite-participant-pane) */
+import { useState } from 'react';
 import { ChatHeader } from './ChatHeader';
 import { chatCompositeContainerStyle, chatScreenContainerStyle } from './styles/ChatScreen.styles';
 import { createAutoRefreshingCredential } from './utils/credential';
@@ -41,6 +42,9 @@ export const ChatScreen = (props: ChatScreenProps): JSX.Element => {
       document.body.style.overflow = 'null';
     };
   }, []);
+
+  /* @conditional-compile-remove(chat-composite-participant-pane) */
+  const [hideParticipants, setHideParticipants] = useState<boolean>(true);
 
   const { currentTheme } = useSwitchableFluentTheme();
 
@@ -98,12 +102,20 @@ export const ChatScreen = (props: ChatScreenProps): JSX.Element => {
             adapter={adapter}
             fluentTheme={currentTheme.theme}
             options={{
-              autoFocus: 'sendBoxTextField'
+              autoFocus: 'sendBoxTextField',
+              /* @conditional-compile-remove(chat-composite-participant-pane) */
+              participantPane: !hideParticipants
             }}
             onFetchAvatarPersonaData={onFetchAvatarPersonaData}
           />
         </Stack.Item>
-        <ChatHeader onEndChat={() => adapter.removeParticipant(userId)} />
+        <ChatHeader
+          /* @conditional-compile-remove(chat-composite-participant-pane) */
+          isParticipantsDisplayed={hideParticipants !== true}
+          onEndChat={() => adapter.removeParticipant(userId)}
+          /* @conditional-compile-remove(chat-composite-participant-pane) */
+          setHideParticipants={setHideParticipants}
+        />
       </Stack>
     );
   }

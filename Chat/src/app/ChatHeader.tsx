@@ -15,8 +15,15 @@ import {
   smallLeaveButtonContainerStyle
 } from './styles/ChatHeader.styles';
 import { useTheme } from '@azure/communication-react';
+/* @conditional-compile-remove(chat-composite-participant-pane) */
+import { PeopleButton, PeopleButtonProps } from './PeopleButton';
 
 export interface ChatHeaderProps {
+  onEndChat(): void;
+}
+
+/* @conditional-compile-remove(chat-composite-participant-pane) */
+export interface ChatHeaderProps extends PeopleButtonProps {
   onEndChat(): void;
 }
 
@@ -32,7 +39,12 @@ export const ChatHeader = (props: ChatHeaderProps): JSX.Element => {
       className={chatHeaderContainerStyle}
       role="banner"
     >
-      <div className={paneButtonContainerStyle}>{}</div>
+      <div className={paneButtonContainerStyle}>
+        {
+          /* @conditional-compile-remove(chat-composite-participant-pane) */
+          <PeopleButton {...props} />
+        }
+      </div>
       <DefaultButton
         className={mergeStyles(largeLeaveButtonContainerStyle, leaveButtonStyle, {
           color: theme.palette.neutralPrimaryAlt
@@ -44,7 +56,6 @@ export const ChatHeader = (props: ChatHeaderProps): JSX.Element => {
         aria-live={'polite'}
         aria-label={leaveString}
       />
-
       <IconButton
         iconProps={leaveIcon}
         className={mergeStyles(smallLeaveButtonContainerStyle, greyIconButtonStyle, {
